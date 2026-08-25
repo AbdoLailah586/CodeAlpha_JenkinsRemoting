@@ -1,0 +1,54 @@
+services:
+  # ==============================================================================
+  # Jenkins Controller (Master Node)
+  # ==============================================================================
+  jenkins-controller:
+    build:
+      context: ./jenkins-controller
+      dockerfile: Dockerfile
+    image: codealpha-jenkins-controller:1.0.0
+    container_name: jenkins-controller
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+      - "50000:50000"
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+    networks:
+      - jenkins-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ==============================================================================
+  # Jenkins Remote Agent (Worker Node)
+  # ==============================================================================
+  jenkins-agent:
+    build:
+      context: ./jenkins-agent
+      dockerfile: Dockerfile
+    image: codealpha-jenkins-agent:1.0.0
+    container_name: jenkins-agent
+    restart: unless-stopped
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0+ct7CW88JzkoAzLYvGv+FmwFlZumZtYtEj7Ur/HkZECKgBh8CTxwGm+PU/YwbprqnV7gQcv8ERC3l/bPbV2RIUy9fMji1y2JC0ZkN+d/d6ywQ4cJhYII9YpWg3DckDqdcJyfC8kfnX//OzZ/gKS+cT5KGGmETZn0oCS2DD2OrzCRCVe1nj4xQOJQFKlucnwQ/CZVoCmaxic8fQft0slzxz2HanpcI0wB1hLzEZJet39F9Q2107xWolUQ21XPxyM2r1E2P9nEBQuB75Bum2uVtVHwnbJJhVJe2z9uksCZIuSDkM+zeqTc0A7JXURifLw6bWQOm0Qcy1+cXPmlJGBr
+    networks:
+      - jenkins-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 128M
+
+networks:
+  jenkins-net:
+    driver: bridge

@@ -1,0 +1,123 @@
+jenkins:
+  systemMessage: "CodeAlpha DevOps Internship - Distributed Jenkins Remoting Cluster"
+  numExecutors: 0 # Enforce Controller Security & Node Isolation (0 builds on controller)
+  mode: EXCLUSIVE
+  scmCheckoutRetryCount: 2
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+          name: "CodeAlpha Admin"
+          description: "DevOps Administrator"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: true
+
+  nodes:
+    - permanent:
+        name: "remote-linux-agent"
+        remoteFS: "/home/jenkins/agent"
+        numExecutors: 2
+        mode: NORMAL
+        labelString: "linux-agent docker-node"
+        launcher:
+          ssh:
+            host: "jenkins-agent"
+            port: 22
+            credentialsId: "codealpha-ssh-key"
+            sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+        retentionStrategy: "always"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: GLOBAL
+              id: "codealpha-ssh-key"
+              username: "jenkins"
+              description: "SSH Key for Remote Agent Remoting"
+              privateKeySource:
+                directEntry:
+                  privateKey: |
+                    -----BEGIN RSA PRIVATE KEY-----
+                    MIIEowIBAAKCAQEAtPnLewlvPCc5KAMy2Lxr/hZsBZWbpmbWLRI+1K/x5GRAioAY
+                    fAk8cBpvj1P2MG6a6p1e4EHL/BEQt5f2z21dkSFMvXzI4tctiQtGZDfnf3essEOH
+                    CYWCCPWKVoNw3JA6nXCcnwvJH51//zs2f4CkvnE+ShhphE2Z9KAktgw9jq8wkQlX
+                    tZ4+MUDiUBSpbnJ8EPwmVaApmsYnPH0H7dLJc8c9h2p6XCNMAdYS8xGSXrd/RfUN
+                    tdO8VqJVENtVz8cjNq9RNj/ZxAULge+QbptrlbVR8J2ySYVSXts/bpLAmSLkg5DP
+                    s3qk3NAOyV1EYny8Om1kDptEHMtfnFz5pSRgawIDAQABAoIBAAWtNCm8JltlAOZK
+                    u2SQUcmFhdvi+8qLZ+UVW8KAxlNF+xRHvPzfA/X246WY75xIoTQCEwDGb5HiLdEP
+                    GN8cF2w+9tDsF20DbNqN76ZNw/Amnn8Pjy5y8UeQqXHZ65yvgCHXb2zkX2mjdL6v
+                    v8ozYczWG9W9JZ97GPzTAnPHYdhA2avteVQIkt0DyYw0yTWoQ2szSx7r0XvnRf8a
+                    oMIEc8FcKRxcdZ+wJyCl7qHc5U/+lyRGfUVnfuJaAObTX850njFjy/p59KftWnQa
+                    7ILDHmFgWabOaZyZ7NsHkltq2ZvkW5gUiNJAk5JgZMpzLErPSxjfeLHoDG4rsYD/
+                    Wyp/5/kCgYEA28iCP/zATUE3Sq3gtKrTObrRuD4W77b6dvFjJyCpkyIN0VFjNGyN
+                    fY8zmEB//4j+9v6KMIdSoFd3QRuj/rGo6dk0tJ2Pso2y4oJVFRgkW2XkAOB0PQ+C
+                    tGiaRk/IByNDFRndIEf+HuvDJX2EaZ5ajouU7ti9GVf8rxYHpPObB1UCgYEA0sw0
+                    Pu25F42IgVfF8OPRRU8lCPw6rYiK5uqs+EIH0uxSn6lb1WFlOD5IEwck9VAw8IfO
+                    TGdSH8sV6szKlceDo2zsJAOBOpzPpI/ZgJDVplAa/uSRLxzCzIBu4MEofsEOKMYM
+                    aDaNMO6wR2Fau+JH4dzaLA/gHh8+ujxAzczCSL8CgYAQQvCoLVpJHQcrRlw24eDJ
+                    B7KWsDlgOSik/k04yujhEwb0stHlQhbh8GN/413VGVzMB59P4eNSK8aOEa57nMeD
+                    reeBaZsFOgi/S6dh7Sxbetl42yKelfQ0xvyLMUH6jThcalJ7HfiGbyk8L+JJMkc+
+                    /sLhPTYYlvMCPV4JbWDOFQKBgGWx8E6fnxj2xfEoaC0Tq0UVrpdMH/7SDbjjZHkM
+                    Wfvu2Nl/+fbSWuOsYFcVrkXO3x1bVzJS8jK2Zid1jxJ9Q0uXY8DoE/Mz7ZTFdTfq
+                    J7hpkux/Vm91H6FLILK7XQ7xkiQnj5rDHpCJxm9ZT02vF+CmDHcPXZ8KkdeE8/qV
+                    GvG/AoGBAIyMmoFlU6oJ6cv6HvQAOaTOxvgEXhEOYhjpo1yl/4YQ3aE6cIOe7uII
+                    HZRXGMclBFQHLyXNbNwXVzvSMtf9Z4Le0yQDqYeRKksIEEte+sjK2DiKatL6JcSz
+                    0dKFupVCfKCtqfma+3YCa/F/QtQiZmoXsRTLl9Dvn/eCZzClu83S
+                    -----END RSA PRIVATE KEY-----
+
+jobs:
+  - script: >
+      pipelineJob('CodeAlpha-Distributed-Build-Job') {
+        definition {
+          cps {
+            sandbox(true)
+            script('''
+              pipeline {
+                  agent { label 'linux-agent' }
+                  
+                  stages {
+                      stage('1. Verify Remote Node & Architecture') {
+                          steps {
+                              echo '== Connected to Jenkins Remote Agent via SSH Remoting =='
+                              sh 'uname -a'
+                              sh 'whoami'
+                              sh 'hostname'
+                              sh 'java -version'
+                          }
+                      }
+                      
+                      stage('2. Execute Distributed Workload') {
+                          steps {
+                              echo '== Running Isolated Workload on Remote Node =='
+                              sh 'echo "Simulating automated build and test pipeline..."'
+                              sh 'mkdir -p build_output && echo "Build Success on $(hostname)" > build_output/result.txt'
+                          }
+                      }
+                      
+                      stage('3. Node Isolation & Security Audit') {
+                          steps {
+                              echo '== Verifying Node Security Isolation =='
+                              sh 'pwd'
+                              sh 'ls -la'
+                              sh 'cat build_output/result.txt'
+                          }
+                      }
+                  }
+                  
+                  post {
+                      always {
+                          echo '== Distributed Job Completed Successfully on Remote Agent! =='
+                      }
+                  }
+              }
+            '''.stripIndent())
+          }
+        }
+      }

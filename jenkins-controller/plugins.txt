@@ -1,0 +1,6 @@
+configuration-as-code
+ssh-slaves
+workflow-aggregator
+git
+pipeline-stage-view
+job-dsl

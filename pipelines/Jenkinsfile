@@ -1,0 +1,49 @@
+pipeline {
+    agent { 
+        label 'linux-agent' 
+    }
+    
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        ansiColor('xterm')
+    }
+    
+    stages {
+        stage('1. Verify Remote Node & Architecture') {
+            steps {
+                echo '=== Checking Jenkins Remote Agent Connection ==='
+                sh 'uname -a'
+                sh 'whoami'
+                sh 'hostname'
+                sh 'java -version'
+                sh 'git --version'
+            }
+        }
+        
+        stage('2. Distributed Workload Execution') {
+            steps {
+                echo '=== Running Workload on Isolated Remote Node ==='
+                sh 'echo "Simulating automated compile, test, and package steps..."'
+                sh 'mkdir -p target && echo "Build Success on $(hostname) at $(date)" > target/build-info.txt'
+            }
+        }
+        
+        stage('3. Node Isolation & Security Verification') {
+            steps {
+                echo '=== Verifying Node Isolation & File Permissions ==='
+                sh 'pwd'
+                sh 'ls -la target/'
+                sh 'cat target/build-info.txt'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '🎉 Distributed Build Pipeline Succeeded on Remote Node!'
+        }
+        failure {
+            echo '❌ Pipeline failed on remote node. Check agent connectivity.'
+        }
+    }
+}
