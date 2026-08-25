@@ -111,18 +111,7 @@ A distributed pipeline job named **`CodeAlpha-Distributed-Build-Job`** is create
 
 ---
 
-## 📹 LinkedIn Video Demonstration Outline
-1. **Introduction**: Introduce Task 2 (Jenkins Remoting Project) for **@CodeAlpha**.
-2. **Architecture**: Explain the Master/Agent distributed architecture and why master isolation (`0 executors`) is crucial in enterprise DevOps.
-3. **Live Demonstration**:
-   - Show the Jenkins Nodes page ([http://localhost:8082/manage/computer/](http://localhost:8082/manage/computer/)) highlighting the connected `remote-linux-agent`.
-   - Run the pipeline **CodeAlpha-Distributed-Build-Job**.
-   - Show the Console Output displaying the agent hostname and remote execution logs.
-4. **Conclusion**: Recap the benefits of Jenkins Remoting (scalability, security isolation, multi-platform builds).
-
----
-
 ## 👤 Author
-- **Intern Name:** CodeAlpha Intern
+- **Intern Name:** Abdulrahman Reda Lailah
 - **Internship Program:** CodeAlpha DevOps Internship
 - **Task:** Task 2 - Jenkins Remoting Project
